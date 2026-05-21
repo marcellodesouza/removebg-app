@@ -3,6 +3,7 @@
 #  build_appimage.sh
 #  Gera um AppImage do Remove Background App
 #  - Modelos de IA baixados sob demanda na primeira execucao
+#  - xclip embutido (nao requer instalacao no sistema)
 #
 #  Pre-requisitos:
 #    - python3, python3-venv, python3-tk
@@ -50,6 +51,12 @@ fi
 if ! ldconfig -p | grep -q libfuse.so.2; then
     echo "📦 Instalando libfuse2…"
     sudo apt-get install -y libfuse2
+fi
+
+# Garante que xclip esta instalado para poder ser copiado
+if ! command -v xclip &>/dev/null; then
+    echo "📦 Instalando xclip (para embutir no AppImage)…"
+    sudo apt-get install -y xclip
 fi
 
 # ── 2. Ambiente virtual + dependências Python ─────────────────────────────────
@@ -123,6 +130,15 @@ mkdir -p "$APPDIR/usr/share/icons/hicolor/256x256/apps"
 
 cp -r "$BUILD_DIR/dist/removebg" "$APPDIR/usr/bin/removebg"
 
+# Embutir xclip no AppImage
+XCLIP_BIN="$(command -v xclip)"
+if [ -f "$XCLIP_BIN" ]; then
+    echo "   Embutindo xclip: $XCLIP_BIN"
+    cp "$XCLIP_BIN" "$APPDIR/usr/bin/xclip"
+else
+    echo "   ⚠ xclip nao encontrado — botao Copiar exigira xclip instalado no sistema"
+fi
+
 # Icone
 ICON_SRC="$SCRIPT_DIR/icon.png"
 if [ ! -f "$ICON_SRC" ]; then
@@ -139,7 +155,7 @@ fi
 cp "$ICON_SRC" "$APPDIR/removebg.png"
 cp "$ICON_SRC" "$APPDIR/usr/share/icons/hicolor/256x256/apps/removebg.png"
 
-cat > "$APPDIR/removebg.desktop" << 'EOF'
+cat > "$APPDIR/removebg.desktop" << 'DESKTOP'
 [Desktop Entry]
 Name=Remove Background
 Comment=Remove o fundo de imagens usando IA
@@ -148,14 +164,19 @@ Icon=removebg
 Type=Application
 Categories=Graphics;RasterGraphics;
 Keywords=background;remove;rembg;
-EOF
+DESKTOP
 
 cat > "$APPDIR/AppRun" << 'APPRUN'
 #!/bin/bash
 USER_MODELS="$HOME/.local/share/removebg/models"
 mkdir -p "$USER_MODELS"
 export U2NET_HOME="$USER_MODELS"
-exec "$APPDIR/usr/bin/removebg/removebg" "$@"
+
+# Expoe o xclip embutido antes do PATH do sistema
+SELF_DIR="$(dirname "$(readlink -f "$0")")"
+export PATH="$SELF_DIR/usr/bin:$PATH"
+
+exec "$SELF_DIR/usr/bin/removebg/removebg" "$@"
 APPRUN
 chmod +x "$APPDIR/AppRun"
 
@@ -185,6 +206,7 @@ echo ""
 echo "   chmod +x RemoveBackground.AppImage"
 echo "   ./RemoveBackground.AppImage"
 echo ""
+echo "   ✦ xclip embutido — botao Copiar funciona sem instalacao extra."
 echo "   ✦ Modelos baixados na primeira execução de cada um."
 echo "   ✦ Após o download, funciona 100% offline."
 echo ""

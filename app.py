@@ -88,6 +88,20 @@ def model_is_cached(key):
 # Clipboard helper — xclip fica vivo em background (comportamento normal)
 # ---------------------------------------------------------------------------
 
+def _find_xclip():
+    """Localiza o xclip: primeiro dentro do AppImage, depois no sistema."""
+    # Quando rodando como AppImage, APPDIR aponta para o AppDir montado
+    appdir = os.environ.get("APPDIR", "")
+    if appdir:
+        bundled = os.path.join(appdir, "usr", "bin", "xclip")
+        if os.path.isfile(bundled):
+            log.debug("xclip: usando versao embutida em %s", bundled)
+            return bundled
+    found = shutil.which("xclip")
+    log.debug("xclip: usando versao do sistema: %s", found)
+    return found
+
+
 def _xclip_copy(img_rgba, callback_ok, callback_err):
     """Copia imagem RGBA para clipboard via xclip.
 
@@ -95,7 +109,8 @@ def _xclip_copy(img_rgba, callback_ok, callback_err):
     leia o clipboard (comportamento padrao do X11). Nao esperamos ele terminar:
     apenas verificamos que iniciou sem erro imediato e chamamos callback_ok.
     """
-    if not shutil.which("xclip"):
+    xclip_bin = _find_xclip()
+    if not xclip_bin:
         callback_err(
             "xclip nao encontrado.\n"
             "Instale com:\n  sudo apt install xclip"
@@ -109,7 +124,7 @@ def _xclip_copy(img_rgba, callback_ok, callback_err):
 
         # Popen: nao bloqueia — xclip fica vivo ate o proximo Ctrl+V
         proc = subprocess.Popen(
-            ["xclip", "-selection", "clipboard", "-t", "image/png"],
+            [xclip_bin, "-selection", "clipboard", "-t", "image/png"],
             stdin=subprocess.PIPE,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
