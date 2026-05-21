@@ -15,7 +15,7 @@ chmod +x RemoveBackground.AppImage
 ./RemoveBackground.AppImage
 ```
 
-> Na primeira execução, o modelo padrão (U2Net, ~170 MB) será baixado automaticamente.
+> Na primeira vez que clicar em **Remover Fundo**, o modelo padrão (U2Net, ~170 MB) será baixado automaticamente e salvo para uso offline nas próximas vezes.
 
 ---
 
@@ -85,7 +85,7 @@ sudo apt install python3 python3-pip python3-venv xclip
 
 ```bash
 # Clone o repositório
-git clone https://github.com/SEU_USUARIO/removebg-app.git
+git clone https://github.com/marcellodesouza/removebg-app.git
 cd removebg-app
 
 # Crie e ative um ambiente virtual
@@ -108,17 +108,18 @@ python3 app.py
 - GNU/Linux x86_64
 - Python 3.8+ com `pip` e `venv`
 - `wget` ou `curl`
-- `xclip` (runtime, não build)
 - Conexão com internet (para baixar dependências e o `appimagetool`)
 
 ```bash
 sudo apt install python3 python3-pip python3-venv wget
 ```
 
+> O `xclip` é instalado automaticamente pelo script de build e embutido no AppImage — não é necessário tê-lo instalado no sistema para usar o app.
+
 ### Gerar o AppImage
 
 ```bash
-git clone https://github.com/SEU_USUARIO/removebg-app.git
+git clone https://github.com/marcellodesouza/removebg-app.git
 cd removebg-app
 
 chmod +x build_appimage.sh
@@ -129,9 +130,10 @@ O script irá:
 1. Criar um ambiente virtual isolado em `build_tmp/`
 2. Instalar todas as dependências Python
 3. Empacotar tudo com PyInstaller
-4. Baixar o `appimagetool` e gerar o `RemoveBackground.AppImage`
+4. Copiar o `xclip` para dentro do AppImage
+5. Baixar o `appimagetool` e gerar o `RemoveBackground.AppImage`
 
-O AppImage final terá entre **130–150 MB**. Os modelos de IA **não são embutidos** no AppImage — são baixados na primeira execução de cada modelo, mantendo o arquivo de distribuição leve.
+O AppImage final terá entre **130–150 MB**. Os modelos de IA **não são embutidos** — são baixados na primeira vez que cada modelo é usado, mantendo o arquivo de distribuição leve.
 
 ### Estrutura do projeto
 
@@ -161,5 +163,6 @@ removebg-app/
 - [ONNX Runtime](https://onnxruntime.ai/) — inferência dos modelos na CPU
 - [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) — interface gráfica dark mode
 - [Pillow](https://python-pillow.org/) — manipulação de imagens
+- [xclip](https://github.com/astrand/xclip) — cópia de imagens para a área de transferência (embutido no AppImage)
 - [PyInstaller](https://pyinstaller.org/) — empacotamento
 - [appimagetool](https://appimage.github.io/) — geração do AppImage
