@@ -2,7 +2,7 @@
 
 App desktop para **GNU/Linux** que remove o fundo de imagens usando inteligência artificial — tudo processado localmente, sem enviar seus dados para nenhum servidor.
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue) ![Platform](https://img.shields.io/badge/platform-GNU%2FLinux-orange) ![License](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/Python-3.8+-blue) ![Platform](https://img.shields.io/badge/platform-GNU%2FLinux-orange) ![License](https://img.shields.io/badge/license-MIT-green) ![Downloads](https://img.shields.io/github/downloads/marcellodesouza/removebg-app/total)
 
 ---
 
@@ -16,6 +16,19 @@ chmod +x RemoveBackground.AppImage
 ```
 
 > Na primeira vez que clicar em **Remover Fundo**, o modelo padrão (U2Net, ~170 MB) será baixado automaticamente e salvo para uso offline nas próximas vezes.
+
+---
+
+## Screenshots
+
+**Abrindo uma imagem**
+![Imagem aberta](screenshots/Imagem-Aberta.png)
+
+**Selecionando um modelo — download sob demanda**
+![Escolhendo modelo](screenshots/Escolhendo_Modelo.png)
+
+**Fundo removido com recorte automático**
+![Fundo removido](screenshots/Fundo_Removido.png)
 
 ---
 
@@ -142,6 +155,7 @@ removebg-app/
 ├── app.py               # Código principal (UI + lógica)
 ├── build_appimage.sh    # Script de build
 ├── icon.png             # Ícone do app (gerado automaticamente se ausente)
+├── screenshots/         # Capturas de tela para o README
 └── README.md
 ```
 
